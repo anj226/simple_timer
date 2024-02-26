@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    *{
+      font-size: 20vw;
+      text-align: center;
+      font-family: "Noto Sans TC";
+      background-color: black;
+      color: ivory;
+      font-weight: 300;
+    }
+
+    textarea{
+        border: 0px;
+        vertical-align: middle;
+        border-collapse: collapse;
+        height: 30vw;
+        width: 100%;
+        z-index: 1;
+        resize: none;
+        padding-top: 7vw;
+    }
+    
+    textarea:focus {
+        outline: none !important;
+        border:0px solid red;
+    }
+    @keyframes flash {
+      0% { color: white; opacity: 0.9; }
+      50% { color: white; opacity: 0.3; }
+      100% { color: white; opacity: 0.9; }
+    }
+  </style>
+</head>
+<!-- Display the countdown timer in an element -->
+<body>
+
+<textarea id="timer" type="text">00:00:00 </textarea>
+
+<script>
+
+class When {
+  constructor(when) {
+    this.set(when);
+  }
+  set(when) {
+    var [h, m, s] = when.split(":");
+    console.log(parseInt(h) * 3600 + parseInt(m) * 60 + parseInt(s));
+    this.end = Date.now() + (parseInt(h) * 3600 + parseInt(m) * 60 + parseInt(s)) * 1000;
+    this.stop = false;
+    this.tmp = 0;
+  }
+  remain(){
+    // console.log(Math.ceil((this.end - Date.now()) / 1000))
+    return Math.ceil((this.end - Date.now()) / 1000);
+  }
+  display(){
+    var time;
+    if (this.stop) time = this.tmp;
+    else time = this.remain();
+    
+    if (time < 0) {
+      time = 0;
+    }
+    var h = Math.floor(time / 3600);
+    var m = Math.floor(time / 60) % 60;
+    var s = time % 60;
+    console.log(h, m, s);
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  }
+  freeze(){
+    if (this.stop) return;
+    else{
+      this.stop = true;
+      this.tmp = this.remain();
+    }
+  }
+  proceed(){
+    if (!this.stop) return;
+    else{
+      this.stop = false;
+      this.tmp = 0;
+    }
+  }
+}
+
+// Set the date we're counting down to
+var Timer = new When("00:00:00");
+
+// Update the count down every 1 second
+var x = setInterval(function() {
+  if (document.activeElement.id == "timer"){
+    // console.log("[modifying]");
+    document.getElementById("timer").style.animation = "flash 1.5s infinite";
+    Timer.freeze();
+  } else {
+    // console.log("[running]");
+    if (Timer.stop){
+      Timer.set( document.getElementById("timer").value );
+      Timer.proceed();
+    }
+    
+    if (Timer.remain() < 0) document.getElementById("timer").style.color = "red";
+    else document.getElementById("timer").style.color = "white";
+    
+    document.getElementById("timer").style.animation = "OAO";
+    document.getElementById("timer").value = Timer.display();
+  }
+}, 10);
+</script>
+</body>
+</html>
